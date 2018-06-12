@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <title>Pokemon</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/pagination.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="js/pagination.js"></script>
+    <script>
+        /* 20 items per page */
+        pagination_initialise(20);
+    </script>
+</head>
+<body>
+    <div class="img-container">
+        <div>
+            <img src="images/hero-background.jpg" class="img-responsive img-header"/>
+        </div>
+        <div class="header-text">Pokemon Gallery</div>
+    </div>
+
+    <div class="container" style="text-align: center;">
+        <!-- Search box -->
+        <input id="searchInput" type="text" placeholder="Search.." autocomplete="off">
+
+        <!-- Pagination-->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="javascript:showPreviousPage();">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="javascript:showNextPage();">Next</a></li>
+            </ul>
+        </nav>
+
+        <!-- Pokemon container -->
+        <div id="contentDiv" class="row">
+
+        </div>
+    </div>
+
+    <!-- construct content: pokemon panels -->
+    <script>
+        var max_panels = 151;
+        $(document).ready(function(){
+            // Search box
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+
+                // Find matching text in each panel.
+                $("#contentDiv div").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+
+                showCurrentPage();      // Refresh current page
+            });
+
+            // Construct panels
+            for (i=0; i<max_panels; i++) {
+                var id = i+1;
+
+                $("#contentDiv").append("<div id=\"panelDiv" + id + "\" class=\"panelContainer\">" +
+                                        "<p><img class='pokemon-img-container' src=\"images/" + id + ".png\"/></p>" +
+                                        "<p class='panelText'>#" + id + "</p>" +
+                                        "<p class='panelText' id=\"pokemon_name_" + id + "\"></p>" +
+                                        "</div>");
+            }
+
+
+            // Retrieve pokemon names through the restful API
+            $.get( "https://pokeapi.co/api/v2/pokemon/?limit=" + max_panels, function( data ) {
+                for (i=0; i<max_panels; i++) {
+                    var id = i+1;
+                    // Update the pokemon's name in the panel
+                    $('#pokemon_name_' + id).text(data.results[i].name);
+                }
+            });
+
+            showCurrentPage();
+
+        });
+
+    </script>
+</body>
+
+
+</html>
